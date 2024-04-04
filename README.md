@@ -1,5 +1,9 @@
 # SolidStart Websocket Demo
 
+> ⚠️ Caution
+>
+> This will not work with Firefox as it seems to be intolerant to the [empty buffer hack](https://github.com/peerreynders/solid-start-ws-demo/blob/main/src/server/ws.ts#L38-L40); the original crossws demo works fine as the request is upgraded immediately by the core server and the buffer handed to the websocket server is at the correct position in the original request body. The issue here is that the upgrade is happening way too late in the request's lifetime
+
 Ported the UnJS [crossws](https://crossws.unjs.io/guide#quick-start) [h3 example](https://github.com/unjs/crossws/tree/7dacb0004c8e17baad378fa028e949f90e0fc440/examples/h3) to [SolidStart v1.0.0-rc.0](https://github.com/solidjs/solid-start/releases/tag/v1.0.0-rc.0).
 
 To be clear; SolidStart at this point does not seem to directly leverage the [h3-based WebSocket capability](https://h3.unjs.io/guide/websocket) emerging for [Nitro](https://nitro.unjs.io/guide/websocket#opt-in-to-the-experimental-feature) and [Nuxt](https://github.com/pi0/nuxt-chat/blob/main/nuxt.config.ts).
