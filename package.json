@@ -6,17 +6,17 @@
     "build": "vinxi build",
     "start": "vinxi start"
   },
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/peerreynders/solid-start-ws-demo"
-	},
-	"keywords": [],
-	"author": "Peer Reynders",
-	"license": "MIT",
-	"homepage": "https://github.com/peerreynders/solid-start-ws-demo#readme",
-	"bugs": {
-		"url": "https://github.com/peerreynders/solid-start-ws-demo/issues"
-	},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peerreynders/solid-start-ws-demo"
+  },
+  "keywords": [],
+  "author": "Peer Reynders",
+  "license": "MIT",
+  "homepage": "https://github.com/peerreynders/solid-start-ws-demo#readme",
+  "bugs": {
+    "url": "https://github.com/peerreynders/solid-start-ws-demo/issues"
+  },
   "dependencies": {
     "@solidjs/meta": "^0.29.3",
     "@solidjs/start": "^1.0.0-rc.0",

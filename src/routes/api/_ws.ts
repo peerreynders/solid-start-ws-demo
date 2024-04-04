@@ -1,5 +1,5 @@
 // file: src/routes/api/_ws.ts
-import { handleUpgrade, isWsConnect } from '../../server/ws';
+import { handleUpgrade, isWsConnect } from '../../entry-server';
 import type { APIEvent } from "@solidjs/start/server";
 
 export function GET(event: APIEvent) {

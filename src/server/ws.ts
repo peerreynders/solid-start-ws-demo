@@ -1,5 +1,4 @@
 // file: src/server/ws.ts
-import type { IncomingMessage } from 'node:http';
 import wsAdapter from 'crossws/adapters/node';
 
 const websocket = wsAdapter({
@@ -35,14 +34,6 @@ const websocket = wsAdapter({
 	},
 });
 
-const emptyBuffer = Buffer.from('');
-const handleUpgrade = (request: IncomingMessage) =>
-	websocket.handleUpgrade(request, request.socket, emptyBuffer);
+console.log('server/ws', new Date());
 
-const isWsConnect = ({ headers }: IncomingMessage) =>
-	headers['connection']?.toLowerCase() === 'upgrade' &&
-	headers['upgrade'] === 'websocket' &&
-	headers['sec-websocket-version'] === '13' &&
-	typeof headers['sec-websocket-key'] === 'string';
-
-export { handleUpgrade, isWsConnect };
+export { websocket };
