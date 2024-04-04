@@ -1,0 +1,214 @@
+/* file: public/styles.css */
+blockquote,
+dd,
+dl,
+figure,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+p,
+pre {
+	margin: 0;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+	font-family: inherit;
+	font-feature-settings: inherit;
+	font-variation-settings: inherit;
+	font-size: 100%;
+	font-weight: inherit;
+	line-height: inherit;
+	letter-spacing: inherit;
+	color: inherit;
+	margin: 0;
+	padding: 0;
+}
+
+button,
+select {
+	text-transform: none;
+}
+
+button,
+input:where([type='button']),
+input:where([type='reset']),
+input:where([type='submit']) {
+	-webkit-appearance: button;
+	background-color: transparent;
+	background-image: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+	opacity: 1;
+	color: #9ca3af;
+}
+
+[role='button'],
+button {
+	cursor: pointer;
+}
+
+:disabled {
+	cursor: default;
+}
+
+:root {
+	--font-size-xs: 0.75rem;
+	--line-height-xs: 1rem;
+	--blue-300: rgb(147 197 253);
+	--blue-500: rgb(59 130 246);
+	--blue-500_05: rgb(59 130 246 / 0.5);
+	--blue-600: rgb(37 99 235); 
+	--gray-500: rgb(107 114 128);
+	--gray-700: rgb(55 65 81); 
+	--gray-800: rgb(31 41 55);
+	--white: rgb(255 255 255);
+	--ring-offset-color: var(--white);
+	--ring-color: var(--blue-500_05);	
+}
+
+*, ::after, ::before {
+	box-sizing: border-box;
+	border-width: 0;
+  border-style: solid;
+  border-color: #e5e7eb;
+}
+
+html {
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -moz-tab-size: 4;
+  tab-size: 4;
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+  -webkit-tap-highlight-color: transparent;
+	display: block;
+}
+
+body {
+	background-color: #1a1a1a;
+	height: 100vh;
+	margin: 0;
+	line-height: inherit;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+#messages {
+	padding: 2rem 1rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+}
+
+.c-message {
+	margin-bottom: 1rem;
+	display: flex;
+	align-items: center;
+
+	& > div {
+		display: flex;
+		flex-direction: column;
+	}
+}
+
+.c-message:last-child {
+	margin-bottom: 2rem;
+}
+
+.c-message__annotation {
+	color: var(--gray-500);
+	font-size: var(--font-size-xs);
+	line-height: var(--line-height-xs);
+	margin-top: 0.25rem;
+	margin-left: 2.5rem
+}
+
+.c-message__card {
+	display: flex;
+	align-items: center;
+
+	& img {
+		border-radius: 9999px;
+		width: 2rem;
+		height: 2rem;
+	}
+
+	& div {
+		padding: 0.5rem;
+		background-color: var(--gray-800);
+		border-radius: 0.5rem;
+		margin-left: 0.5rem;
+
+		& p {
+			color: var(--white);
+		}
+	}
+}
+
+.c-chatbox {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	padding: 0.5rem 1rem;
+	background-color: var(--gray-800);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.c-chatbox__message {
+	width: 100%;
+	min-width: 1.5rem;
+
+	& input {
+		width: 100%;
+		padding: 0.5rem 1rem;
+		color: var(--white);
+		background-color: var(--gray-700);
+		border-top-left-radius: 0.5rem;
+		border-bottom-left-radius: 0.5rem;
+
+		&:focus {
+    	outline: 2px solid transparent;
+    	outline-offset: 2px;
+ 			box-shadow: 0 0 0 3px var(--ring-color); 
+			border-color: var(--blue-300);
+		}
+	}
+}
+
+.c-chatbox__menu {
+	display: flex;
+
+	& button {
+		padding: 0.5rem 1rem;
+		color: var(--white);
+		background-color: var(--blue-500);
+
+		&:hover {
+			background-color: var(--blue-600);
+		}
+	}
+
+	& button:last-child {
+		border-top-right-radius: 0.5rem;
+		border-bottom-right-radius: 0.5rem;
+	}
+}
