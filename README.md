@@ -2,15 +2,17 @@
 
 Ported the UnJS [crossws](https://crossws.unjs.io/guide#quick-start) [h3 example](https://github.com/unjs/crossws/tree/7dacb0004c8e17baad378fa028e949f90e0fc440/examples/h3) to [SolidStart v1.0.0-rc.0](https://github.com/solidjs/solid-start/releases/tag/v1.0.0-rc.0).
 
-To be clear; SolidStart at this point does not seem to directly leverage the [h3-based WebSocket capability](https://h3.unjs.io/guide/websocket) emerging for [Nitro](https://nitro.unjs.io/guide/websocket#opt-in-to-the-experimental-feature) and [Nuxt](https://github.com/pi0/nuxt-chat/blob/main/nuxt.config.ts); the functionality is *experimental* even for those products.
+To be clear; SolidStart at this point does not seem to directly leverage the [h3-based WebSocket capability](https://h3.unjs.io/guide/websocket) emerging for [Nitro](https://nitro.unjs.io/guide/websocket#opt-in-to-the-experimental-feature) and [Nuxt](https://github.com/pi0/nuxt-chat/blob/main/nuxt.config.ts).
+The functionality is **experimental** even for those products.
 
-While vinxi has already assimilated this *experimental* capability, examples seem rely on the [vinxi route configuration](https://github.com/nksaraf/vinxi/blob/4bddafe1b7e873ef691392ebaf7ea4f4875e39d4/examples/react/ssr/basic/app.config.js#L25-L31) binding the server side websocket [`eventHandler`](https://github.com/nksaraf/vinxi/blob/4bddafe1b7e873ef691392ebaf7ea4f4875e39d4/examples/react/ssr/basic/app/ws.ts#L3) directly to the vinxi application.. 
+While vinxi has already assimilated this *experimental* capability, examples seem rely on the [vinxi route configuration](https://github.com/nksaraf/vinxi/blob/4bddafe1b7e873ef691392ebaf7ea4f4875e39d4/examples/react/ssr/basic/app.config.js#L25-L31) binding the server side websocket [`eventHandler`](https://github.com/nksaraf/vinxi/blob/4bddafe1b7e873ef691392ebaf7ea4f4875e39d4/examples/react/ssr/basic/app/ws.ts#L3) directly to the vinxi application.
 
-SolidStart doesn't expose vinxi routes but wraps them with its own [routing abstraction](https://github.com/solidjs/solid-start/blob/2d75d5fedfd11f739b03ca34decf23865868ac09/packages/start/config/index.js#L78) which currently doesn't explicitly accomodate websocket routes. Given that this is an evolving UnJS standard, it makes sense to wait for the capability to stabilize in Nitro and vinxi before adapting it into the SolidStart's architecture.
+SolidStart doesn't expose vinxi routes but wraps them with its own [routing abstraction](https://github.com/solidjs/solid-start/blob/2d75d5fedfd11f739b03ca34decf23865868ac09/packages/start/config/index.js#L78) which currently doesn't explicitly accomodate websocket routes.
+Given that this is an evolving UnJS standard, it makes sense to wait for the capability to stabilize in Nitro and vinxi before adapting it into SolidStart's architecture.
 
 It turns out that it is possible to subvert [API Routes](https://github.com/solidjs/solid-start/blob/2d75d5fedfd11f739b03ca34decf23865868ac09/packages/start/config/index.js#L78) into upgrading websocket connections.
 
-[`src/routes/api/_ws.ts`](src/routes/api/_ws.ts) demonstrates the approach to connect the client to the websocket server in [`src/server/ws.ts`](src/server/ws.ts).
+[`src/routes/api/_ws.ts`](src/routes/api/_ws.ts) demonstrates the approach of connecting clients to the websocket server in [`src/server/ws.ts`](src/server/ws.ts).
 
 ---
 
