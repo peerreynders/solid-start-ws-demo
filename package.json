@@ -7,7 +7,7 @@
     "start": "vinxi start",
 		"format": "prettier --write ./src workaround.ts",
     "preview": "node .output/server/index.mjs",
-    "wa:bundle": "node_modules/.pnpm/node_modules/.bin/esbuild workaround.ts --bundle --platform=node --format=esm --outfile=wa.mjs",
+    "wa:bundle": "node_modules/.pnpm/esbuild@0.20.2/node_modules/esbuild/bin/esbuild workaround.ts --bundle --platform=node --format=esm --outfile=wa.mjs",
     "wa:preview": "node wa.mjs & node .output/server/index.mjs"
   },
   "repository": {
