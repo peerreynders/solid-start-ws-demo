@@ -24,6 +24,10 @@ const gravatarSuffix = Math.random().toString();
 const gravatarHref = (user: string) =>
 	`https://www.gravatar.com/avatar/${encodeURIComponent(user + gravatarSuffix)}?s=512&d=monsterid`;
 
+const hrefToWs = (location: Location) =>
+	`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/_ws/`;
+//	`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.hostname}:3001/_ws/`;
+
 // WebSocket related
 function wsConnect(ctx: WsContext) {
 	if (ctx.ws) {
@@ -99,7 +103,7 @@ export default function App() {
 		// Initialize once monted client side
 		wsContext = {
 			ws: undefined,
-			href: `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/_ws/`,
+			href: hrefToWs(location),
 			onMessage,
 			log,
 			clear,
@@ -163,4 +167,3 @@ export default function App() {
 		</MetaProvider>
 	);
 }
-

@@ -4,7 +4,11 @@
   "scripts": {
     "dev": "vinxi dev",
     "build": "vinxi build",
-    "start": "vinxi start"
+    "start": "vinxi start",
+		"format": "prettier --write ./src workaround.ts",
+    "preview": "node .output/server/index.mjs",
+    "wa:bundle": "node_modules/.pnpm/node_modules/.bin/esbuild workaround.ts --bundle --platform=node --format=esm --outfile=wa.mjs",
+    "wa:preview": "node wa.mjs & node .output/server/index.mjs"
   },
   "repository": {
     "type": "git",
@@ -18,16 +22,17 @@
     "url": "https://github.com/peerreynders/solid-start-ws-demo/issues"
   },
   "dependencies": {
-    "@solidjs/meta": "^0.29.3",
-    "@solidjs/start": "^1.0.0-rc.0",
-    "crossws": "^0.2.4",
-    "solid-js": "^1.8.16",
-    "vinxi": "^0.3.10"
+    "@solidjs/meta": "^0.29.4",
+    "@solidjs/start": "^1.0.8",
+    "crossws": "^0.3.1",
+    "solid-js": "^1.9.1",
+    "vinxi": "^0.4.3"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
-    "@types/node": "^20.12.3"
+    "@types/node": "^22.7.4",
+    "prettier": "^3.3.3"
   }
 }
