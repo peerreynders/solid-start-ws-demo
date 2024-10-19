@@ -5,10 +5,8 @@
     "dev": "vinxi dev",
     "build": "vinxi build",
     "start": "vinxi start",
-		"format": "prettier --write ./src workaround.ts",
-    "preview": "node .output/server/index.mjs",
-    "wa:bundle": "node_modules/.pnpm/esbuild@0.20.2/node_modules/esbuild/bin/esbuild workaround.ts --bundle --platform=node --format=esm --outfile=wa.mjs",
-    "wa:preview": "node wa.mjs & node .output/server/index.mjs"
+    "format": "prettier --write ./src",
+    "preview": "node .output/server/index.mjs"
   },
   "repository": {
     "type": "git",
@@ -23,9 +21,8 @@
   },
   "dependencies": {
     "@solidjs/meta": "^0.29.4",
-    "@solidjs/start": "^1.0.8",
-    "crossws": "^0.3.1",
-    "solid-js": "^1.9.1",
+    "@solidjs/start": "^1.0.9",
+    "solid-js": "^1.9.2",
     "vinxi": "^0.4.3"
   },
   "engines": {

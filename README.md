@@ -1,57 +1,13 @@
 # SolidStart Websocket Demo
 
-**Updated** to use [crossws](https://github.com/unjs/crossws) 0.3.1 and [SolidStart](https://github.com/solidjs/solid-start) 1.0.8.
-
-> [!WARNING]
-> This demonstration works in `dev` mode, with the development server. Unfortunately right now the `build` version has the client's `WebSocket` failing with a “WebSocket connection to 'ws://localhost:3000/api/_ws/' failed: Invalid frame header” error. (It seems Nitro is only used in the `build` but not under `dev`.)
->
-> The workaround is to run the websocket connection on a separate server
-> 
-> To demonstrate the `build` workaround modify [`src/app.tsx`](src/app.tsx) to:
-> ```tsx
-> const hrefToWs = (location: Location) =>
-> //  `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/_ws/`;
->   `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.hostname}:3001/_ws/`; 
-> ```
->
-> then
->
-> ```shell
-> /solid-start-ws-demo$ pnpm build
-> …
-> 
-> /solid-start-ws-demo$ pnpm wa:bundle
->
-> solid-start-ws-demo@ wa:bundle /solid-start-ws-demo
-> node_modules/.pnpm/esbuild@0.20.2/node_modules/esbuild/bin/esbuild workaround.ts --bundle --platform=node --format=esm --outfile=wa.mjs
->
->
->  wa.mjs  118.7kb
->
-> ⚡ Done in 13ms
->
-> /solid-start-ws-demo$ pnpm wa:preview
->
-> solid-start-ws-demo@ wa:preview /solid-start-ws-demo
-> node wa.mjs & node .output/server/index.mjs
->
-> server/ws 2024-10-04T02:44:43.325Z
-> Listening on http://[::]:3000
-> ```
+**Updated** to use [SolidStart](https://github.com/solidjs/solid-start) 1.0.9.
 
 Ported the UnJS [crossws](https://crossws.unjs.io/guide#quick-start) [h3 example](https://github.com/unjs/crossws/tree/05ded7bd961d26d310786f529c0deb8cf9dcf02c/examples/h3) ([StackBlitz](https://stackblitz.com/github/unjs/crossws/tree/main/examples/h3)) to [SolidStart v1](https://github.com/solidjs/solid-start/releases/tag/v1.0.0).
 
-To be clear; SolidStart at this point does not seem to directly leverage the [h3-based WebSocket capability](https://h3.unjs.io/guide/websocket) emerging for [Nitro](https://nitro.unjs.io/guide/websocket#opt-in-to-the-experimental-feature) and [Nuxt](https://github.com/pi0/nuxt-chat/blob/main/nuxt.config.ts).
-The functionality is **experimental** even for those products.
-
-While vinxi has already assimilated this *experimental* capability, examples seem rely on the [vinxi route configuration](https://github.com/nksaraf/vinxi/blob/4bddafe1b7e873ef691392ebaf7ea4f4875e39d4/examples/react/ssr/basic/app.config.js#L25-L31) binding the server side websocket [`eventHandler`](https://github.com/nksaraf/vinxi/blob/4bddafe1b7e873ef691392ebaf7ea4f4875e39d4/examples/react/ssr/basic/app/ws.ts#L3) directly to the vinxi application.
-
-SolidStart doesn't expose vinxi routes but wraps them with its own [routing abstraction](https://github.com/solidjs/solid-start/blob/2d75d5fedfd11f739b03ca34decf23865868ac09/packages/start/config/index.js#L78) which currently doesn't explicitly accomodate websocket routes.
-Given that this is an evolving UnJS standard, it makes sense to wait for the capability to stabilize in Nitro and vinxi before adapting it into SolidStart's architecture.
-
-It turns out that it is possible to subvert [API Routes](https://docs.solidjs.com/solid-start/building-your-application/api-routes) into upgrading to websocket connections.
-
-[`src/routes/api/_ws.ts`](src/routes/api/_ws.ts) demonstrates the approach of connecting clients to the websocket server in [`src/server/ws.ts`](src/server/ws.ts).
+Concurrently with the 1.0.9 release the SolidStart documentation was updated with instructions on how to leverage Nitro's **experimental** support (crossws based) for WebSockets:
+- SolidStart: [WebSocket Endpoint](https://docs.solidjs.com/solid-start/advanced/websocket)
+- Nitro: [WebSocket—Opt-in to the experimental feature](https://nitro.unjs.io/guide/websocket#opt-in-to-the-experimental-feature)
+- crossws: [Pub / Sub](https://crossws.unjs.io/guide/pubsub)
 
 ---
 
@@ -95,16 +51,23 @@ vinxi starting dev server
 The server side core functionality is found in [`src/server/ws.ts`](src/server/ws.ts):
 
 ```ts
-const ws = crossws({
-  hooks: {
-    open(peer) {
+export default eventHandler({
+  handler() {},
+  websocket: {
+    async open(peer) {
       console.log('[ws] open', peer);
+      
+      const user = userFromId(peer.id);
+      peer.send(toPayload(SERVER_ID, `Welcome ${user}`));
 
-      peer.send(toPayload('server', `Welcome ${userFromId(peer.id)}`));
+      // Join new client to the "chat" channel
+      peer.subscribe(CHANNEL_NAME);
+      // Notify every other connected client
+      peer.publish(CHANNEL_NAME, toPayload(SERVER_ID,`${user} joined!`));
     },
 
-    message(peer, message) {
-      const user = userFromId(peer.id);
+    async message(peer, message) {
+       const user = userFromId(peer.id);
       console.log('[ws] message', user, message);
 
       const content = message.text();
@@ -114,39 +77,30 @@ const ws = crossws({
       }
 
       const payload = toPayload(peer.id, content);
-      for (const destination of peer.peers) destination.send(payload);
+      // The server re-broadcasts incoming messages to everyone … 
+      peer.publish(CHANNEL_NAME, payload);
+      // … but the source 
+      peer.send(payload);
     },
 
-    close(peer, event) {
-      console.log('[ws] close', userFromId(peer.id), event);
+    async close(peer, details) {
+      const user = userFromId(peer.id);
+      console.log('[ws] close', user, details);
+
+      peer.unsubscribe(CHANNEL_NAME);
+      peer.publish(CHANNEL_NAME, toPayload(SERVER_ID,`${user} has left the chat!`));
     },
 
-    error(peer, error) {
+    async error(peer, error) {
       console.log('[ws] error', userFromId(peer.id), error);
-    },
-
-    upgrade(req) {
-      console.log(`[ws] upgrading ${req.url}...`);
-      return {
-        headers: {},
-      };
     },
   },
 });
-
-const handleUpgrade = (request: IncomingMessage) =>
-  ws.handleUpgrade(request, request.socket, Buffer.alloc(0));
-
-const isWsConnect = ({ headers }: IncomingMessage) =>
-  headers['connection']?.toLowerCase().includes('upgrade') &&
-  headers['upgrade'] === 'websocket' &&
-  headers['sec-websocket-version'] === '13' &&
-  typeof headers['sec-websocket-key'] === 'string';
 ```
 
-`crossws` abstracts the websocket interface to `upgrade`, `open`, `message`, `close` and `error` event( callback)s. All but `upgrade` involve a `peer` type which represents the particular client the event is associated with.
+Nitro/crossws abstracts the WebSocket interface to the `open`, `message`, `close` and `error` "hooks" (event callbacks). The `Peer<T>` type represents the particular client the event is associated with.
 
-The `peer` structure has a `peers` member which enumerates the currently active clients on this socket which were all upgraded on this `ws` structure's `handleUpgrade` function. This is what allows the `message` event hook to send the server bound message to all the clients, including the originator.
+The [`Peer`](https://crossws.unjs.io/guide/peer) structure exposes [pub/sub](https://crossws.unjs.io/guide/pubsub) methods which make it possible *for the server* to broadcast (`peer.publish(channel, message)`) a `message` to the subscribers of a `channel` on behalf of that `peer` (i.e. the `peer` won't receive that `message`). 
 
 Note that the payload is explicitly `send` as a `string`.
 
@@ -158,24 +112,9 @@ const toPayload = (from: String, message: string) =>
 
 Non-string values are sent as binary [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob)s which have to be [deserialized](https://developer.mozilla.org/en-US/docs/Web/API/Blob#extracting_data_from_a_blob) on the receiving side as well.
 
-The API endpoint [`src/routes/api/_ws.ts`](src/routes/api/_ws.ts) associates that singleton `ws` structure with the server's `/api/_ws` URL:
+It needs to be noted that the pub/sub functionality is self-contained to the endpoint's WebSocket peers so that the server can coordinate communication among those peers. If it is necessary for the server to *initiate* communication with the endpoint's peers it may be necessary to mitigate the [server/routes lobotomy](https://github.com/peerreynders/server_-routes-lobotomy), e.g. have each peer subscribe to a [`BroadcastChannel`](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) to which the server [`postMessage()`](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel/postMessage)s any relevant data.
 
-```ts
-export function GET(event: APIEvent) {
-  const request = event.nativeEvent.node.req;
-  if (!isWsConnect(request))
-    return new Response(undefined, { status: 400, statusText: 'Bad Request' });
-
-  handleUpgrade(request);
-
-  return undefined;
-}
-
-```
-
-`isWsConnect` simply checks whether the request holds the expected headers for a websocket request. With those requirements satisfied the request is handed over to the `ws` structure for upgrade and subsequent handling. 
-
-On the client side ([`src/app.tsx`](src/app.tsx)) the websocket is handled on the vanilla level. Related data is aggregated in a context structure:
+On the client side ([`src/app.tsx`](src/app.tsx)) the WebSocket is handled on the vanilla level. Related data is aggregated in a context structure:
 
 ```ts
 type WsContext = {
@@ -192,7 +131,7 @@ type WsContext = {
 
 ```ts
 const hrefToWs = (location: Location) =>
-  `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/_ws/`;
+  `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/_ws/`;
 ```
 
 `log()` manages client-bound messages.

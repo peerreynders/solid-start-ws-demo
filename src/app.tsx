@@ -19,14 +19,15 @@ type WsContext = {
 	send: (data: string | ArrayBufferLike | Blob | ArrayBufferView) => void;
 };
 
+const APPLICATION_ID = 'app';
+
 // Top level helpers
 const gravatarSuffix = Math.random().toString();
 const gravatarHref = (user: string) =>
 	`https://www.gravatar.com/avatar/${encodeURIComponent(user + gravatarSuffix)}?s=512&d=monsterid`;
 
 const hrefToWs = (location: Location) =>
-	`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/_ws/`;
-//	`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.hostname}:3001/_ws/`;
+	`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/_ws/`;
 
 // WebSocket related
 function wsConnect(ctx: WsContext) {
@@ -78,14 +79,14 @@ export default function App() {
 
 	const clear = () => {
 		setMessages([]);
-		log('system', 'previous messages cleared');
+		log(APPLICATION_ID, 'previous messages cleared');
 	};
 
 	// Websocket message handler & support
 	const onMessage = (event: MessageEvent<string>) => {
 		const { user, message } = event.data.startsWith('{')
 			? (JSON.parse(event.data) as { user: string; message: unknown })
-			: { user: 'system', message: event.data };
+			: { user: APPLICATION_ID, message: event.data };
 
 		log(user, typeof message === 'string' ? message : JSON.stringify(message));
 	};
