@@ -13,26 +13,23 @@ Concurrently with the 1.0.9 release the SolidStart documentation was updated wit
 
 ```shell
 $ cd solid-start-ws-demo
-solid-start-ws-demo$ pnpm install
-Lockfile is up to date, resolution step is skipped
-Packages: +467
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-Progress: resolved 467, reused 467, downloaded 0, added 467, done
-node_modules/.pnpm/esbuild@0.20.2/node_modules/esbuild: Running postinstall script, done in 52ms
+$ pnpm install
+Packages: +469
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Progress: resolved 469, reused 469, downloaded 0, added 469, done
 
 dependencies:
 + @solidjs/meta 0.29.4
-+ @solidjs/start 1.0.8
-+ crossws 0.3.1
-+ solid-js 1.9.1
++ @solidjs/start 1.0.9
++ solid-js 1.9.2
 + vinxi 0.4.3
 
 devDependencies:
-+ @types/node 22.7.4
 + prettier 3.3.3
 
-Done in 1.1s
-solid-start-ws-demo$ pnpm dev
+Done in 1.3s
+$ pnpm run dev
 
 > solid-start-ws-demo@ dev solid-start-ws-demo
 > vinxi dev
@@ -42,6 +39,8 @@ vinxi starting dev server
 
   ➜ Local:    http://localhost:3000/
   ➜ Network:  use --host to expose
+
+enabling websockets
 ```
 
 ---
@@ -113,6 +112,26 @@ const toPayload = (from: String, message: string) =>
 Non-string values are sent as binary [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob)s which have to be [deserialized](https://developer.mozilla.org/en-US/docs/Web/API/Blob#extracting_data_from_a_blob) on the receiving side as well.
 
 It needs to be noted that the pub/sub functionality is self-contained to the endpoint's WebSocket peers so that the server can coordinate communication among those peers. If it is necessary for the server to *initiate* communication with the endpoint's peers it may be necessary to mitigate the [server/routes lobotomy](https://github.com/peerreynders/server_-routes-lobotomy), e.g. have each peer subscribe to a [`BroadcastChannel`](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) to which the server [`postMessage()`](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel/postMessage)s any relevant data.
+
+The server configuration needs to load the endpoint's WebSocket hooks in [`app.config.ts`](app.config.ts):
+
+```ts
+import { defineConfig } from "@solidjs/start/config";
+
+export default defineConfig({
+  server: {
+    experimental: {
+      websocket: true,
+    },
+  },
+}).addRouter({
+  name: "_ws",
+  type: "http",
+  handler: "./src/server/ws.ts",
+  target: "server",
+  base: "/_ws",
+});
+```
 
 On the client side ([`src/app.tsx`](src/app.tsx)) the WebSocket is handled on the vanilla level. Related data is aggregated in a context structure:
 

@@ -21,9 +21,6 @@ importers:
         specifier: ^0.4.3
         version: 0.4.3(@types/node@22.7.4)(ioredis@5.3.2)(terser@5.30.3)
     devDependencies:
-      '@types/node':
-        specifier: ^22.7.4
-        version: 22.7.4
       prettier:
         specifier: ^3.3.3
         version: 3.3.3

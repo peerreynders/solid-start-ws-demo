@@ -1,6 +1,6 @@
 // file: src/server/ws.ts
 // compare: https://docs.solidjs.com/solid-start/advanced/websocket
-// see: https://crossws.unjs.io/guide/pubsub 
+// see: https://crossws.unjs.io/guide/pubsub
 import { eventHandler } from 'vinxi/http';
 
 const userFromId = (id: string) => id.slice(-6);
